@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lks-irs-fe
+  namespace: monitoring
+  labels:
+    app: lks-irs-fe
+    environment: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lks-irs-fe
+  template:
+    metadata:
+      labels:
+        app: lks-irs-fe
+        environment: monitoring
+    spec:
+      imagePullSecrets:
+      - name: ecr-secret
+      containers:
+      - name: irs-fe
+        image: 937545714058.dkr.ecr.us-east-1.amazonaws.com/lks/irs-fe:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5 
